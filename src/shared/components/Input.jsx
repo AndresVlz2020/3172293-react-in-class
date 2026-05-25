@@ -1,16 +1,13 @@
 export default function Input({
     label,
     htmlFor,
-    type= "text",
+    type = "text",
     ...props
-}){
-
-
-    return(
+}) {
+    return (
         <div>
-
             {/* Label */}
-            <label 
+            <label
                 htmlFor={htmlFor}
                 className="
                     block
@@ -18,57 +15,39 @@ export default function Input({
                     mb-1
                     text-secondary
                 "
-                >
+            >
                 {label}
             </label>
 
             {/* Contenedor de input */}
             <div
                 className="
-                    relativo
+                    relative
                     h-10
                     flex
                     items-center
                 "
-                
-                >
-                    {/* Área interactiva invisible (48px) */}
-                <div
+            >
+                <input
+                    id={htmlFor}
+                    type={type}
                     className="
-                        absolute 
-                        inset-0
-                    "
-                    onMouseDown={(e)=>{
-                        e.preventDefault();
-                        e.currentTarget.nextSibling();
-                    }}
-                    />
-                    
-                    {/* Input visual */}
-                    <input
-                        type={type}
-                        className="
                         relative
                         w-full
                         h-10
                         rounded-md
-                        border-border-black
+                        border
+                        border-black
+                        bg-white
                         px-4
                         text-body
-
                         focus:outline-none
                         focus:ring-2
                         focus:ring-primary
-                        "
-                        {...props}
-
-                        
-                    />
-
-                  </div>
-
-
-
+                    "
+                    {...props}
+                />
+            </div>
         </div>
-    )
+    );
 }
