@@ -1,0 +1,78 @@
+:root {
+  /* Primary color */
+  --color-primary-950: #4DB100;
+  --color-primary-900: #55B40C;
+  --color-primary-800: #67BC26;
+  --color-primary-700: #79C43F;
+  --color-primary-600: #8BCC59;
+  --color-primary-500: #9DD472;
+  --color-primary-400: #AEDB8C;
+  --color-primary-300: #C0E3A5;
+  --color-primary-200: #D2EBBF;
+  --color-primary-100: #EAF3D8;
+  --color-primary-50:  #F6FBF2;
+
+  /* Secondary color */
+  --color-secondary-950: #FED638;
+  --color-secondary-900: #FED841;
+  --color-secondary-800: #FEDC55;
+  --color-secondary-700: #FEE069;
+  --color-secondary-600: #FEE47D;
+  --color-secondary-500: #FEE891;
+  --color-secondary-400: #FEECA5;
+  --color-secondary-300: #FEF0B9;
+  --color-secondary-200: #FEF4CD;
+  --color-secondary-100: #FEF8E1;
+  --color-secondary-50:  #FEFCF5;
+
+  /* Tertiary-2 color */
+  --color-tertiary-950: #50E5F9;
+  --color-tertiary-900: #58E6F9;
+  --color-tertiary-800: #6AE8F9;
+  --color-tertiary-700: #7BEBFA;
+  --color-tertiary-600: #8DEEFB;
+  --color-tertiary-500: #9EF0FB;
+  --color-tertiary-400: #B0F3FC;
+  --color-tertiary-300: #C1F5FC;
+  --color-tertiary-200: #D3F8FD;
+  --color-tertiary-100: #E4FBFE;
+  --color-tertiary-50:  #F6FDFE;
+
+  /* Basic color */
+  --color-white: #fff;
+  --color-black: #000;
+  --color-gray-950: #101010;
+  --color-gray-900: #262626;
+  --color-gray-800: #3B3B3B;
+  --color-gray-700: #515151;
+  --color-gray-600: #676767;
+  --color-gray-500: #7D7D7D;
+  --color-gray-400: #929292;
+  --color-gray-300: #A8A8A8;
+  --color-gray-200: #BEBEBE;
+  --color-gray-100: #D4D4D4;
+  --color-gray-50:  #E9E9E9;
+
+  /* Font-family */
+  --main-font: Helvetica, arial, sans-serif;
+  --secondary-font: Calibri, Helvetica, Arial;
+
+  /* Font-size */
+  --fs-xxxxl: 5rem; /* Ultra grande */
+  --fs-xxxl:  4rem; /* Súper grande */
+  --fs-xxl:   3rem; /* Extra grande */
+  --fs-xl:    2.5rem; /* Muy grande */
+  --fs-lg:    2rem; /* Grande */
+  --fs-md:    1.5rem; /* titulos */
+  --fs-sm:    1.25rem; /* subtitulo */
+  --fs-xs:    1.0rem; /* Extra pequeño */
+  --fs-xxs:   0.875rem; /* Extra extra pequeño */
+  --fs-xxxs:  0.75rem; /* Mínimo */
+  --fs-xxxxs:  0.5rem; /* Mínimo */
+
+   /* grosores de la fuente */
+    --fw-regular: 400; 
+    --fw-medium:  500; 
+    --fw-bold:    700; 
+    --fw-black:   900;
+}
