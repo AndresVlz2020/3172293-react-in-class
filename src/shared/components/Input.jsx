@@ -10,14 +10,13 @@ export default function Input({
     // Obligatorio que estos valores tienen que ser con variables
     const variants = {
         primary:`
-        border-brand
+        border-color-primary-950
         bg-background
         `,
         secondary:`
-        border-red-950
-        `,
+        border-color-secondary-300  `,
         tertiary:`
-        border-green-950
+        border-color-tertiary-800
         `,
     }
     const sizes = {
