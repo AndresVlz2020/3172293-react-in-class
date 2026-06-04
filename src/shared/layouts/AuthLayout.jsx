@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import authBg from "@/assets/images/bg-1.png"; 
-import { Input, Button } from "@/shared"; 
+import { Input, Button, DeleteCounter2 } from "@/shared"; 
 
 export default function AuthLayout(){
   return (
@@ -68,7 +68,8 @@ export default function AuthLayout(){
               >Guardar
             </Button>
           </div>
-
+          <h1>Ejemplo 1</h1>
+          <DeleteCounter2 />
 
 
           <Outlet/>
