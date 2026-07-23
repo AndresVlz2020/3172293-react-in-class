@@ -46,7 +46,7 @@ export  default function UserRegisterForm() {
             // Se copian todos los valores anteriores del estado
             ...prev,
 
-            // S actualiza unicamente lo que cambio
+            // Se actualiza unicamente lo que cambio
             [name]: type === "checkbox" ? checked : value,
         }));
 
@@ -250,16 +250,15 @@ export  default function UserRegisterForm() {
             type="submit"
             > Guardar
             </Button>
-            </div>
-            </form>
-
-                      <IconButton
+            <IconButton
             ariaLabel="Volver"
             variant="ghost"
             onClick={() => navigate(-1)}
           >
             <ArrowLeft />
           </IconButton>
+            </div>
+            </form>
 
           </div>
 

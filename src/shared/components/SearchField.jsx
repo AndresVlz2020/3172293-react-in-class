@@ -88,7 +88,7 @@ const SearchField = forwardRef(
 
                  <input 
                     ref={ref}
-                    type="search"
+                    type="text"
                     name={name}
                     value={value}
                     disabled={disabled}
