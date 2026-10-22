@@ -10,9 +10,14 @@ import { Login } from "@/features/auth";
 
 
 const router = createBrowserRouter([
+
   {
-    path: "/",
+    path: "/login",
     element: <Login/>,
+  },
+  {
+    path: "/home",
+    element: <HomePage />,
   },
   {
     path: "/Auth",
