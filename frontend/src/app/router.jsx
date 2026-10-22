@@ -4,6 +4,7 @@ import { AuthLayout } from "@/shared";
 import { DashboardLayout} from "@/shared";
 import { UserListPage, UserRegisterForm } from "@/features/users";
 import { HomePage } from "@/features/home";
+import { Login } from "@/features/auth";
 // import DeleteCounter from "@/shared/components/DeleteCounter";
 
 
@@ -11,7 +12,7 @@ import { HomePage } from "@/features/home";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomePage/>,
+    element: <Login/>,
   },
   {
     path: "/Auth",

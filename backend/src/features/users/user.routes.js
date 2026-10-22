@@ -1,29 +1,22 @@
-// Importamops Router desde express
+// Importamos router desde Express.
 // Router permite modularizar las rutas por feature
-// y mantener el archivo principal de la app limpio
-
+// Y mantener el archivo principal de la app limpio
 import { Router } from "express";
 
 // Importamos el controlador de usuarios.
-// El router nunca implementa lógica,
-// Solo delega la ejecución al controller
-
+// El router nunca implementa la logica.
+// Solo delega la ejecucion al controller.
 import { userController } from "./user.controller.js";
 
-// Creamos una instancia de Router de express
-
+// Creamos una instancia del router de Express
 const router = Router();
 
-router.get("/", userController.getAll);
-
 // Definimos la ruta para crear un usuario
-// POST /users
-// Cuando se recibe una petición POST en la raíz del recurso
-// Express ejecuta el método create del Controller
-
+// POST / users
+// Cuando se recibe una peticion POST en la raiz del recurso.
+// Express ejecuta el metodo create del controller.
 router.post("/", userController.create);
 
-// Exportamos el router para ser registrado en la aplicación principal
-// (ej: app.use("/users", userRouter))
-
+// Exportamos el router para ser registrado en la aplicacion principal
+// (ej: app.use("/users", router))
 export default router;

@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "sweetalert2": "^11.26.25"
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.3"
   }
 }
