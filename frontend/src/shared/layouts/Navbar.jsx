@@ -11,6 +11,7 @@ import {
 import  logo  from "@/assets/images/1-logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
+import { logout } from "@/features/auth/services/logoutService";
 
 
 export default function Navbar(){
@@ -30,6 +31,11 @@ export default function Navbar(){
     console.log("Campo limpiado");
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
 
     return (
       <nav className="w-full bg-transparent border-b-2">
@@ -37,7 +43,7 @@ export default function Navbar(){
           <div className="flex h-16 items-center justify-between">
             {/* Logo de marca */}
             <div className=" hidden sm:block items-center">
-              <Link to={"/dashboard/home"} className="text-h1 font-heading">
+              <Link to={"/home"} className="text-h1 font-heading">
                 <img src={logo} alt="logo" className="h-12" />
               </Link>
             </div>
@@ -47,7 +53,7 @@ export default function Navbar(){
             {/* Links de navegación */}
             <ul className="hidden md:flex items-center gap-6">
               <li>
-                <Link to={"/auth"} className="hover:text-primary transition">
+                <Link to={"/home"} className="hover:text-primary transition">
                   Inicio
                 </Link>
               </li>
@@ -56,17 +62,17 @@ export default function Navbar(){
                   to={"/dashboard"}
                   className="hover:text-primary transition"
                 >
-                  Cursos
+                  Registro
                 </Link>
               </li>
               <li>
-                <Link to={"/inicio"} className="hover:text-primary transition">
-                  Multimedia
+                <Link to={"/dashboard/userList"} className="hover:text-primary transition">
+                  Usuarios
                 </Link>
               </li>
               <li>
-                <Link to={"/inicio"} className="hover:text-primary transition">
-                  Contacto
+                <Link to={"/home"} className="hover:text-primary transition">
+                  Productos
                 </Link>
               </li>
             </ul>
@@ -99,16 +105,16 @@ export default function Navbar(){
 
             {/* Contenido */}
             <DropdownContent className="right-0">
-              <DropdownItem>
+              <DropdownItem onClick={() => navigate("/dashboard")}>
                 Gestión de usuarios
               </DropdownItem>
               <DropdownItem onClick={() => navigate("/dashboard/userList")}>
                 Listar usuarios
               </DropdownItem>
-              <DropdownItem>
+              <DropdownItem onClick={() => navigate("/home")}>
                 Gestión de productos
               </DropdownItem>
-              <DropdownItem>
+              <DropdownItem onClick={handleLogout}>
                 Cerrar sesión
               </DropdownItem>
             </DropdownContent>

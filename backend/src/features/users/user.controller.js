@@ -37,13 +37,23 @@ export const userController = {
             // Se registra el error completo para depuracion en backend
             console.error("ERROR BACKEND: ", err);
 
-            // Respuesta HTTP de error generico
-            // 500: error interno del servidor
             res.status(500).json({
                 // Se envia el mensaje del error para diagnostico
                 // En produccion suele mapearse a mensajes controlados
                 error: err.message,
             })
+        }
+    },
+
+    async getAll(req, res) {
+        try {
+            const users = await userService.getAllUsers();
+            res.status(200).json(users);
+        } catch (err) {
+            console.error("ERROR BACKEND GET ALL: ", err);
+            res.status(500).json({
+                error: err.message,
+            });
         }
     }
 }

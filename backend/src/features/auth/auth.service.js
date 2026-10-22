@@ -28,8 +28,8 @@ export const authService = {
 
         const token = jwt.sign(
         { id: user.id, email: user.user_email },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES },
+        process.env.JWT_SECRET || "default_jwt_secret",
+        { expiresIn: process.env.JWT_EXPIRES || "1h" },
         );
 
         return {

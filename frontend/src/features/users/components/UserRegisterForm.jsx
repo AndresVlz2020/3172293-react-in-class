@@ -254,8 +254,8 @@ multiple={true}
             variant="secondary"
             size="sm"
             type="button"
-            onClick= {() => console.log("Boton Cancelar")}
-            > cancelar
+            onClick={() => navigate("/dashboard/userList")}
+            > Cancelar
             </Button>
             
             {/* <Button

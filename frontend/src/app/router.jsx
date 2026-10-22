@@ -10,14 +10,25 @@ import { Login } from "@/features/auth";
 
 
 const router = createBrowserRouter([
-
+  {
+    path: "/",
+    element: <Navigate to="/login" replace />,
+  },
   {
     path: "/login",
-    element: <Login/>,
+    element: <Login />,
   },
   {
     path: "/home",
     element: <HomePage />,
+  },
+  {
+    path: "/inicio",
+    element: <Navigate to="/home" replace />,
+  },
+  {
+    path: "/auth",
+    element: <Navigate to="/login" replace />,
   },
   {
     path: "/Auth",
@@ -33,9 +44,18 @@ const router = createBrowserRouter([
     element: <DashboardLayout />,
     children: [
       { index: true, element: <UserRegisterForm /> },
+      { path: "home", element: <Navigate to="/home" replace /> },
       { path: "auth", element: <Navigate to="/dashboard" replace /> },
       { path: "userList", element: <UserListPage /> },
     ],
+  },
+  {
+    path: "/users/:id/edit",
+    element: <Navigate to="/dashboard" replace />,
+  },
+  {
+    path: "*",
+    element: <Navigate to="/login" replace />,
   },
 ]);
 

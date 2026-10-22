@@ -33,5 +33,9 @@ export const userService = {
         // Actualmente, el método solo delega directamente al repository,
         // sin agregar ninguna lógica adicional
         return await userRepository.create(userData);
-    },    
+    },
+
+    async getAllUsers() {
+        return await userRepository.findAll();
+    },
 };

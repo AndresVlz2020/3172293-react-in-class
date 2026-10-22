@@ -4,20 +4,27 @@
 // const API_URL = "http://localhost:4000/api/users";
 
 import { API_URL } from "../../config";
+import { users as fallbackUsers } from "../data/users";
 
 // API_URL es la base (.../api/users) y se le puede concatenar rutas adicionales si es necesario
 
 const USERS_URL = `${API_URL}/users`;
 
 export async function getUsers() {
-    const response = await fetch(USERS_URL);
+    try {
+        const response = await fetch(USERS_URL);
 
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Error al consultar los usuarios");
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Error al consultar los usuarios");
+        }
+
+        const data = await response.json();
+        return Array.isArray(data) && data.length > 0 ? data : fallbackUsers;
+    } catch (err) {
+        console.warn("Aviso al consultar API de usuarios, usando datos de respaldo:", err.message);
+        return fallbackUsers;
     }
-
-    return response.json();
 }
 
 // Función para crar un usuario en el backend

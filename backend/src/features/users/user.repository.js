@@ -67,4 +67,24 @@ export const userRepository = {
         // En este caso contiene el id del usuario recien creado
         return result.rows[0];
     },
+
+    async findAll() {
+        const query = `
+            SELECT 
+                id,
+                user_name AS name,
+                user_email AS email,
+                user_phone AS phone,
+                user_document_types AS document_type,
+                user_document_number AS document_number,
+                is_staff AS "isStaff",
+                is_active AS "isActive",
+                is_superuser AS "isSuperUser",
+                created_at
+            FROM users
+            ORDER BY id ASC;
+        `;
+        const result = await pool.query(query);
+        return result.rows;
+    },
 };

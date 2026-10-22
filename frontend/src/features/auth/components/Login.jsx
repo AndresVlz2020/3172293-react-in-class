@@ -65,13 +65,26 @@ export default function Login() {
 
             console.log("LOGIN RESPONSE: ", data);
 
-            sessionStorage.setItem("token", data.token);
+            if (data.token) {
+                sessionStorage.setItem("token", data.token);
+            }
+            if (data.user) {
+                sessionStorage.setItem("user", JSON.stringify(data.user));
+            }
 
             // navigate("/"); // o dashboard
             navigate("/dashboard/userList");
         } catch (error) {
             alert(error.message);
         }
+    };
+
+    const handleCancel = () => {
+        setFormData({
+            userEmail: "",
+            userPassword: "",
+        });
+        setErrors({});
     };
 
     return (
@@ -108,7 +121,12 @@ export default function Login() {
 
                     {/* Actions */}
                     <div className="flex items-end justify-end gap-12">
-                        <Button variant="secondary" size="sm">
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            type="button"
+                            onClick={handleCancel}
+                        >
                             Cancelar
                         </Button>
 
