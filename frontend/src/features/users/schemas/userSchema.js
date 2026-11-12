@@ -1,6 +1,15 @@
 import { z } from "zod";
 import { fileSchema } from "../../../shared/schemas/fileSchema";
 
+// Contraseña con las mismas reglas del registro
+const passwordRule = z
+    .string()
+    .min(8, "La contraseña debe tener al menos 8 caracteres")
+    .regex(/[A-Z]/, "Debe contener al menos una letra mayúscula")
+    .regex(/[a-z]/, "Debe contener al menos una letra minúscula")
+    .regex(/[0-9]/, "Debe contener al menos un número")
+    .regex(/[^A-Za-z0-9]/, "Debe contener al menos un caracter especial");
+
 export const userSchema = z.object ({
     userName: z
     .string()
@@ -24,13 +33,7 @@ export const userSchema = z.object ({
     .min(5, "Número de documento inválido")
     .max(20, "Número de documento demasiado largo"),
 
-    userPassword: z
-    .string()
-    .min(8, "La contraseña debe tener al menos 8 caracteres")
-    .regex(/[A-Z]/, "Debe contener al menos una letra mayúscula")
-    .regex(/[a-z]/, "Debe contener al menos una letra minúscula")
-    .regex(/[0-9]/, "Debe contener al menos un número")
-    .regex(/[^A-Za-z0-9]/, "Debe contener al menos un caracter especial"),
+    userPassword: passwordRule,
 
     userImage: fileSchema.pick({ files:true }).shape.files.optional(),
 
@@ -38,14 +41,25 @@ export const userSchema = z.object ({
     .string()
     .url("La url del avatar no es válida")
     .nullable()
-    .optional(),    
-    
+    .optional(),
+
 
     isStaff: z.boolean(),
 
     isActive: z.boolean(),
 
     isSuperUser: z.boolean(),
-    
 
+})
+
+// Schema de edición: mismos campos del registro,
+// pero la contraseña es opcional (vacío = no cambiarla)
+export const userEditSchema = userSchema.extend({
+    userPassword: z
+        .string()
+        .max(100, "La contraseña es demasiado larga")
+        .refine(
+            (value) => value === "" || passwordRule.safeParse(value).success,
+            "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un caracter especial",
+        ),
 })

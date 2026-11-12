@@ -17,6 +17,6 @@ const PORT = process.env.PORT || 4000;
 // Iniciamos el servidor HTTP usando la app de Express
 // listen levanta el servidor y queda a la espera de peticiones
 app.listen(PORT, () => {
-    //Log informativo indicando que el servidor esta corriendo
+    // Log informativo indicando que el servidor esta corriendo
     console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
 });

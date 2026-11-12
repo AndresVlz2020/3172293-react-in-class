@@ -13,8 +13,14 @@ export const authController = {
                 ...result,
             });
         } catch (err) {
-            res.status(401).json({
-                error: err.message,
+            const status =
+                err.message === "Credenciales inválidas" ? 401 :
+                err.message === "Usuario inactivo" ? 403 : 500;
+
+            res.status(status).json({
+                error: status === 500
+                    ? "Error interno al iniciar sesión"
+                    : err.message,
             });
         }
     }

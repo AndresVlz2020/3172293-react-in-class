@@ -63,62 +63,71 @@ export default function FileInput({
   };
 
   return (
+    <div className="flex flex-col items-start gap-2 w-full my-2">
+      <span className="text-[var(--semantic-text-secondary)] text-xs font-semibold">
+        Foto / Archivo — Máx 12 archivos (10MB)
+      </span>
 
-    <div className="flex flex-col items-center gap-2 w-full">
-      <h2 className="text-center text-text-muted text-xs font-semibold mb-1">Máx 12 archivo (10MB)</h2>
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 place-items-center">
-      {value.map((file, i) => (
-        <div
-          key={i}
-          draggable
-          onDragStart={() => setDragIndex(i)}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={() => reorder(dragIndex, i)}
-          className="relative w-24 h-24 border rounded overflow-hidden group"
-        >
-          {/* Render condicional: imagen vs archivo genérico */}
-          {isImage(file) ? (
-            <img src={previews[i]} className="w-full h-full object-contain bg-gray-50" />
-          ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-[10px] px-1">
-              <span className="font-semibold">PDF</span>
-              <span className="truncate w-full text-center">{file.name}</span>
+      <div className="flex flex-wrap items-center gap-2 w-full">
+        {value.map((file, i) => (
+          <div
+            key={i}
+            draggable
+            onDragStart={() => setDragIndex(i)}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={() => reorder(dragIndex, i)}
+            className="relative w-24 h-24 border border-[var(--semantic-border)] rounded-md overflow-hidden group bg-[var(--semantic-background)]"
+          >
+            {/* Render condicional: imagen vs archivo genérico */}
+            {isImage(file) ? (
+              <img
+                src={previews[i]}
+                className="w-full h-full object-contain bg-[var(--color-gray-50)]"
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center bg-[var(--color-gray-100)] text-[10px] px-1">
+                <span className="font-semibold">PDF</span>
+                <span className="truncate w-full text-center">{file.name}</span>
+              </div>
+            )}
+
+            {/* Acciones hover: reorder visual + eliminar */}
+            <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100">
+              <button
+                type="button"
+                className="w-7 h-7 bg-white rounded-full text-black text-xs"
+              >
+                ↕
+              </button>
+              <button
+                type="button"
+                onClick={() => remove(i)}
+                className="w-7 h-7 bg-white rounded-full text-black text-xs"
+              >
+                ✕
+              </button>
             </div>
-          )}
-
-          {/* Acciones hover: reorder visual + eliminar */}
-          <div className="absolute top-1 right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100">
-            <button className="w-7 h-7 bg-white rounded-full text-black text-xs">
-              ↕
-            </button>
-            <button
-              onClick={() => remove(i)}
-              className="w-7 h-7 bg-white rounded-full text-black text-xs"
-            >
-              ✕
-            </button>
           </div>
-        </div>
-      ))}
+        ))}
 
-      {/* Trigger de input oculto + loader */}
-      <div
-        onClick={() => !isLoading && inputRef.current.click()}
-        className="w-24 h-24 border-2 border-dashed rounded flex items-center justify-center cursor-pointer"
-      >
-        {isLoading ? (
-          <InfinityLoader
-            size="55"
-            stroke="4"
-            strokeLength="0.15"
-            bgOpacity="0.1"
-            speed="1.3"
-            color="black"
-          />
-        ) : (
-          <Plus className="text-blue-500" size={24} />
-        )}
-      </div>
+        {/* Trigger de input oculto + loader */}
+        <div
+          onClick={() => !isLoading && inputRef.current.click()}
+          className="w-24 h-24 border-2 border-dashed border-[var(--color-primary-950)] bg-[var(--semantic-background)]/70 rounded-md flex items-center justify-center cursor-pointer hover:bg-[var(--color-primary-50)] transition-colors"
+        >
+          {isLoading ? (
+            <InfinityLoader
+              size="55"
+              stroke="4"
+              strokeLength="0.15"
+              bgOpacity="0.1"
+              speed="1.3"
+              color="black"
+            />
+          ) : (
+            <Plus className="text-[var(--semantic-brand)]" size={24} />
+          )}
+        </div>
       </div>
 
       {/* Input desacoplado de UI */}

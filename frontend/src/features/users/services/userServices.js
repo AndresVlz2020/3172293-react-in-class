@@ -4,33 +4,97 @@
 // const API_URL = "http://localhost:4000/api/users";
 
 import { API_URL } from "../../config";
-import { users as fallbackUsers } from "../data/users";
-
-// API_URL es la base (.../api/users) y se le puede concatenar rutas adicionales si es necesario
 
 const USERS_URL = `${API_URL}/users`;
 
-export async function getUsers() {
-    try {
-        const response = await fetch(USERS_URL);
+export async function getUserById(userId) {
+    const response = await fetch(`${USERS_URL}/${userId}`, {
+        cache: "no-store",
+    });
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || "Error al consultar los usuarios");
-        }
-
-        const data = await response.json();
-        return Array.isArray(data) && data.length > 0 ? data : fallbackUsers;
-    } catch (err) {
-        console.warn("Aviso al consultar API de usuarios, usando datos de respaldo:", err.message);
-        return fallbackUsers;
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Error al consultar el usuario");
     }
+
+    return {
+        ...data,
+        isActive: Boolean(data.isActive ?? data.is_active ?? true),
+    };
+}
+
+export async function getUsers({ activeOnly = false } = {}) {
+    const url = activeOnly ? `${USERS_URL}?active=true` : USERS_URL;
+    const response = await fetch(url, {
+        cache: "no-store",
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Error al consultar los usuarios");
+    }
+
+    if (!Array.isArray(data)) {
+        throw new Error("La API devolvió una respuesta de usuarios inválida");
+    }
+
+    return data.map((user) => ({
+        ...user,
+        isActive: Boolean(user.isActive ?? user.is_active ?? true),
+    }));
+}
+
+// Función para actualizar el estado activo/inactivo de un usuario en PostgreSQL en tiempo real
+export async function updateUserStatus(userId, isActive) {
+    const token = sessionStorage.getItem("token");
+
+    const response = await fetch(`${USERS_URL}/${userId}/status`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ isActive: Boolean(isActive) }),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Error al actualizar el estado del usuario");
+    }
+
+    return response.json();
+}
+
+// Función para actualizar los datos de un usuario existente en el backend
+// Si userPassword viene vacío, el backend mantiene la contraseña actual
+export async function updateUser(userId, userData) {
+    const token = sessionStorage.getItem("token");
+
+    const response = await fetch(`${USERS_URL}/${userId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(userData),
+    });
+
+    const error = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(error.error || "Error al actualizar el usuario");
+    }
+
+    return error;
 }
 
 // Función para crar un usuario en el backend
 // Recibe un objeto con los datos del usuario
 // Retorna la respuesta JSON del servidor
 export async function createUser(userData) {
+    // Enviar JWT al backend
+    const token = sessionStorage.getItem("token");
+
     // Realizamos la petición HTTP usando fetch
     const response = await fetch(USERS_URL, {
         // método HTTP según convención REST
@@ -40,6 +104,7 @@ export async function createUser(userData) {
         // Indicamos que enviamos JSON
         headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
         },
 
         // Convertimos el objeto userData a JSON
@@ -56,6 +121,6 @@ export async function createUser(userData) {
         throw new Error(error.error || "Error al crear el usuario");
     }
 
-        // Si la petición fue exitosa, retornamos la respuesta parseada como JSON
-        return response.json();
-    }
+    // Si la petición fue exitosa, retornamos la respuesta parseada como JSON
+    return response.json();
+}

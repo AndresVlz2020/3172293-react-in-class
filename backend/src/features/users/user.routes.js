@@ -7,15 +7,20 @@ import { Router } from "express";
 // El router nunca implementa la logica.
 // Solo delega la ejecucion al controller.
 import { userController } from "./user.controller.js";
+import { authenticateToken } from "../../middlewares/auth.middleware.js";
 
 // Creamos una instancia del router de Express
 const router = Router();
 
-// Definimos la ruta para crear un usuario
-// POST / users
-// Cuando se recibe una peticion POST en la raiz del recurso.
+// Definimos las rutas de usuarios
 router.get("/", userController.getAll);
-router.post("/", userController.create);
+router.post("/", authenticateToken, userController.create);
+router.get("/:userId", userController.getById);
+router.put("/:userId", authenticateToken, userController.update);
+router.patch("/:userId/status", userController.updateStatus);
+router.put("/:userId/status", userController.updateStatus);
+router.get("/:userId/permissions", userController.getPermissionsByUserId);
+router.put("/:userId/permissions", userController.updatePermissions);
 
 // Exportamos el router para ser registrado en la aplicacion principal
 // (ej: app.use("/users", router))

@@ -2,7 +2,8 @@ import { useState } from "react";
 import { loginSchema } from "../schemas/loginSchema";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
-import { Input, Button } from "@/shared"
+import { Input, Button, showErrorAlert } from "@/shared";
+import { hasPermission } from "@/features/access/services/accessService";
 // import { SquareArrowRightEnter, Menu } from "lucide-react";
 
 export default function Login() {
@@ -11,9 +12,9 @@ export default function Login() {
     const [formData, setFormData] = useState({
         userEmail: "",
         userPassword: "",
-    })
+    });
 
-    const [errors, setErrors] = useState({})
+    const [errors, setErrors] = useState({});
 
     // =========================
     //      Handle Generico
@@ -45,7 +46,7 @@ export default function Login() {
     // submit real + guardar token
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
 
         const result = loginSchema.safeParse(formData);
 
@@ -72,10 +73,34 @@ export default function Login() {
                 sessionStorage.setItem("user", JSON.stringify(data.user));
             }
 
-            // navigate("/"); // o dashboard
-            navigate("/dashboard/userList");
+            try {
+                const perm = await hasPermission("list_user");
+                if (perm.granted) {
+                    navigate("/dashboard/userList");
+                } else {
+                    navigate("/home");
+                }
+            } catch {
+                navigate("/home");
+            }
         } catch (error) {
-            alert(error.message);
+            const isUnauthorized = error.status === 401;
+            const isForbidden = error.status === 403;
+
+            await showErrorAlert({
+                title: isUnauthorized
+                    ? "Credenciales inválidas"
+                    : isForbidden
+                        ? "Cuenta inactiva"
+                        : "No se pudo iniciar sesión",
+                text: isUnauthorized
+                    ? "El correo o la contraseña no coinciden. Si tu contraseña fue restablecida, solicita recuperar el acceso."
+                    : isForbidden
+                        ? "Esta cuenta está inactiva. Contacta al administrador."
+                        : "No se pudo conectar con el servicio de autenticación. Inténtalo más tarde.",
+            }).catch((alertError) => {
+                console.error("No se pudo mostrar el aviso de inicio de sesión:", alertError);
+            });
         }
     };
 
@@ -141,5 +166,5 @@ export default function Login() {
                 </div>
             </form>
         </div>
-    )
+    );
 }

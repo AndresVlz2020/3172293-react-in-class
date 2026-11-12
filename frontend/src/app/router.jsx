@@ -1,18 +1,19 @@
 // src/app/router.jsx
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { AuthLayout } from "@/shared";
-import { DashboardLayout} from "@/shared";
-import { UserListPage, UserRegisterForm } from "@/features/users";
+import { DashboardLayout, ProtectedRoute } from "@/shared";
+import { UserListPage, UserRegisterForm, UserEditPage } from "@/features/users";
 import { HomePage } from "@/features/home";
 import { Login } from "@/features/auth";
-// import DeleteCounter from "@/shared/components/DeleteCounter";
-
-
+import { AccessPage } from "@/features/access";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/login" replace />,
+    element: <Navigate to="/auth" replace />,
+  },
+  {
+    path: "/auth",
+    element: <Login />,
   },
   {
     path: "/login",
@@ -27,35 +28,56 @@ const router = createBrowserRouter([
     element: <Navigate to="/home" replace />,
   },
   {
-    path: "/auth",
-    element: <Navigate to="/login" replace />,
-  },
-  {
-    path: "/Auth",
-    element: <AuthLayout />,
+    path: "/dashboard",
+    element: (
+      <ProtectedRoute>
+        <DashboardLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
+        element: (
+          <ProtectedRoute requiredPermission="create_user">
+            <UserRegisterForm />
+          </ProtectedRoute>
+        ),
+      },
+      { path: "home", element: <Navigate to="/home" replace /> },
+      { path: "auth", element: <Navigate to="/dashboard" replace /> },
+      {
+        path: "userList",
+        element: (
+          <ProtectedRoute requiredPermission="list_user">
+            <UserListPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "access",
+        element: (
+          <ProtectedRoute requiredPermission="admin">
+            <AccessPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "users/:id/edit",
+        element: (
+          <ProtectedRoute>
+            <UserEditPage />
+          </ProtectedRoute>
+        ),
       },
     ],
   },
   {
-    path: "/dashboard",
-    element: <DashboardLayout />,
-    children: [
-      { index: true, element: <UserRegisterForm /> },
-      { path: "home", element: <Navigate to="/home" replace /> },
-      { path: "auth", element: <Navigate to="/dashboard" replace /> },
-      { path: "userList", element: <UserListPage /> },
-    ],
-  },
-  {
     path: "/users/:id/edit",
-    element: <Navigate to="/dashboard" replace />,
+    element: <Navigate to="/dashboard/userList" replace />,
   },
   {
     path: "*",
-    element: <Navigate to="/login" replace />,
+    element: <Navigate to="/auth" replace />,
   },
 ]);
 

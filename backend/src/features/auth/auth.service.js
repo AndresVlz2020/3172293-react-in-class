@@ -1,43 +1,71 @@
 // backend/src/features/auth/auth.service.js
-//Lógica de autenticación + JWT
+// Lógica de autenticación + JWT
 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { authRepository } from "./auth.repository.js";
 
 export const authService = {
-    async login({ email, password }) {
-        const user = await authRepository.findByEmail(email);
+  async login(credentials = {}) {
+    const identifier = String(
+      credentials.email ||
+      credentials.userEmail ||
+      credentials.user_email ||
+      credentials.username ||
+      credentials.user_name ||
+      ""
+    ).trim();
 
-        console.log("USER ENCONTRADO:", user);
+    const password = String(
+      credentials.password ||
+      credentials.userPassword ||
+      credentials.user_password ||
+      ""
+    );
 
-        if (!user) {
-        throw new Error("Credenciales inválidas");
-        }
+    if (!identifier || !password) {
+      throw new Error("Credenciales inválidas");
+    }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        // const isMatch = password === user.password;
+    const user = await authRepository.findByEmail(identifier);
 
-        if (!isMatch) {
-        throw new Error("Credenciales inválidas");
-        }
+    if (!user || !user.password) {
+      throw new Error("Credenciales inválidas");
+    }
 
-        if (!user.is_active) {
-        throw new Error("Usuario inactivo");
-        }
+    // Comparar contra el hash real almacenado en la base de datos PostgreSQL
+    const isMatch = await bcrypt.compare(password, user.password);
 
-        const token = jwt.sign(
-        { id: user.id, email: user.user_email },
-        process.env.JWT_SECRET || "default_jwt_secret",
-        { expiresIn: process.env.JWT_EXPIRES || "1h" },
-        );
+    if (!isMatch) {
+      throw new Error("Credenciales inválidas");
+    }
 
-        return {
-            token,
-            user: {
-                id: user.id,
-                email: user.user_email,
-            },
-        };
-    },
+    if (!user.is_active) {
+      throw new Error("Usuario inactivo");
+    }
+
+    const isAdmin = Boolean(user.is_superuser || user.is_admin_group);
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.user_email,
+        isSuperuser: Boolean(user.is_superuser),
+        isAdmin,
+      },
+      process.env.JWT_SECRET || "default_jwt_secret",
+      { expiresIn: process.env.JWT_EXPIRES || "1h" },
+    );
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        name: user.user_name,
+        email: user.user_email,
+        isSuperuser: Boolean(user.is_superuser),
+        isAdmin,
+      },
+    };
+  },
 };

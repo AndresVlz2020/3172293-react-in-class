@@ -54,10 +54,10 @@ export const userRepository = {
             userDocumentNumber,
             userPassword,
             userAvatarUrl,
-            isStaff,
-            isActive,
-            isSuperuser,
-        ]
+            Boolean(isStaff),
+            isActive !== undefined ? Boolean(isActive) : true,
+            Boolean(isSuperuser),
+        ];
 
         // Ejecutamos la consulta usando al query
         // pool.query retorna un objeto con metadata y filas resultantes
@@ -68,7 +68,7 @@ export const userRepository = {
         return result.rows[0];
     },
 
-    async findAll() {
+    async findAll({ activeOnly = false } = {}) {
         const query = `
             SELECT 
                 id,
@@ -78,13 +78,164 @@ export const userRepository = {
                 user_document_types AS document_type,
                 user_document_number AS document_number,
                 is_staff AS "isStaff",
-                is_active AS "isActive",
+                COALESCE(is_active, TRUE) AS "isActive",
                 is_superuser AS "isSuperUser",
                 created_at
             FROM users
+            WHERE ($1::boolean IS FALSE OR COALESCE(is_active, TRUE) = TRUE)
             ORDER BY id ASC;
         `;
-        const result = await pool.query(query);
+        const result = await pool.query(query, [Boolean(activeOnly)]);
         return result.rows;
+    },
+
+    // Obtener un usuario por ID (sin exponer el hash de la contraseña)
+    async findById(userId) {
+        const query = `
+            SELECT 
+                id,
+                user_name AS name,
+                user_email AS email,
+                user_phone AS phone,
+                user_document_types AS document_type,
+                user_document_number AS document_number,
+                is_staff AS "isStaff",
+                COALESCE(is_active, TRUE) AS "isActive",
+                is_superuser AS "isSuperUser",
+                created_at
+            FROM users
+            WHERE id = $1;
+        `;
+        const result = await pool.query(query, [userId]);
+        return result.rows[0];
+    },
+
+    // Actualizar los datos de un usuario existente
+    // Solo se actualizan los campos presentes en userData
+    async update(userId, userData) {
+        const columnMap = {
+            userName: "user_name",
+            userEmail: "user_email",
+            userPhone: "user_phone",
+            userDocumentTypes: "user_document_types",
+            userDocumentNumber: "user_document_number",
+            userPassword: "user_password",
+            userAvatarUrl: "user_avatar_url",
+        };
+
+        const setClauses = [];
+        const values = [];
+
+        for (const [key, column] of Object.entries(columnMap)) {
+            if (userData[key] !== undefined) {
+                values.push(userData[key]);
+                setClauses.push(`${column} = $${values.length}`);
+            }
+        }
+
+        // Campos booleanos (se aceptan aunque vengan en false)
+        if (userData.isStaff !== undefined) {
+            values.push(Boolean(userData.isStaff));
+            setClauses.push(`is_staff = $${values.length}`);
+        }
+
+        if (userData.isActive !== undefined) {
+            values.push(Boolean(userData.isActive));
+            setClauses.push(`is_active = $${values.length}`);
+        }
+
+        if (userData.isSuperuser !== undefined) {
+            values.push(Boolean(userData.isSuperuser));
+            setClauses.push(`is_superuser = $${values.length}`);
+        }
+
+        if (setClauses.length === 0) {
+            return this.findById(userId);
+        }
+
+        values.push(userId);
+
+        const query = `
+            UPDATE users
+            SET ${setClauses.join(", ")}
+            WHERE id = $${values.length}
+            RETURNING id;
+        `;
+
+        const result = await pool.query(query, values);
+
+        if (result.rowCount === 0) {
+            return undefined;
+        }
+
+        return this.findById(userId);
+    },
+
+    // Actualizar estado activo/inactivo del usuario en PostgreSQL
+    async updateStatus(userId, isActive) {
+        const query = `
+            UPDATE users
+            SET is_active = $1
+            WHERE id = $2
+            RETURNING id, is_active AS "isActive";
+        `;
+        const result = await pool.query(query, [Boolean(isActive), userId]);
+        return result.rows[0];
+    },
+
+    // Obtener permisos directos del usuario por ID
+    async getPermissionsByUserId(userId) {
+        const query = `
+            SELECT
+                p.permission_id,
+                p.permission_name,
+                p.permission_codename
+            FROM user_permissions up
+            INNER JOIN permissions p
+                ON p.permission_id = up.permission_id
+            WHERE up.user_id = $1
+            ORDER BY p.permission_name;
+        `;
+
+        const result = await pool.query(query, [userId]);
+
+        return result.rows;
+    },
+
+    // Actualizar permisos directos del usuario
+    async updatePermissions(userId, permissionIds) {
+        const client = await pool.connect();
+
+        try {
+            await client.query("BEGIN");
+
+            await client.query(
+                `
+                DELETE FROM user_permissions
+                WHERE user_id = $1
+                `,
+                [userId],
+            );
+
+            for (const permissionId of permissionIds) {
+                await client.query(
+                    `
+                    INSERT INTO user_permissions (
+                        user_id,
+                        permission_id
+                    )
+                    VALUES ($1, $2)
+                    `,
+                    [userId, permissionId],
+                );
+            }
+
+            await client.query("COMMIT");
+        } catch (error) {
+            await client.query("ROLLBACK");
+            throw error;
+        } finally {
+            client.release();
+        }
     },
 };

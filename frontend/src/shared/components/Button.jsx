@@ -36,6 +36,7 @@ export default function Button ({
             inline-flex items-center justify-center
             rounded-md
             transition-colors
+            disabled:opacity-60 disabled:cursor-not-allowed
             ${variants[variant]}
             ${sizes[size]}
             `}

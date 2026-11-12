@@ -24,6 +24,9 @@ export default function ReportConfigModal({ isOpen, onClose }) {
   // Estado para filtro por documento
   const [documentNumber, setDocumentNumber] = useState("");
 
+  // Estado de carga durante la generación del reporte
+  const [isGenerating, setIsGenerating] = useState(false);
+
   // Estado de campos seleccionados (inicialización lazy)
   const [selectedFields, setSelectedFields] = useState(() =>
     userReportFields.filter((f) => f.default)
@@ -62,18 +65,25 @@ export default function ReportConfigModal({ isOpen, onClose }) {
 
 
   // Handler principal para generar el reporte
-  const handleGenerateReport = () => {
+  const handleGenerateReport = async () => {
 
-    // Invoca el caso de uso con la configuración actual
-    generateUserReport({
-      format,
-      selectedFields,
-      scope,
-      documentNumber
-    });
+    // Evita dobles clics mientras se consulta la base de datos
+    if (isGenerating) return;
+    setIsGenerating(true);
 
-    // Cierra el modal después de generar el reporte
-    onClose();
+    try {
+      // Invoca el caso de uso con la configuración actual
+      await generateUserReport({
+        format,
+        selectedFields,
+        scope,
+        documentNumber
+      });
+    } finally {
+      setIsGenerating(false);
+      // Cierra el modal después de generar el reporte
+      onClose();
+    }
   };
 
 
@@ -208,8 +218,9 @@ export default function ReportConfigModal({ isOpen, onClose }) {
           <Button
             variant="primary"
             onClick={handleGenerateReport}
+            disabled={isGenerating}
           >
-            Generar reporte
+            {isGenerating ? "Generando..." : "Generar reporte"}
           </Button>
 
 

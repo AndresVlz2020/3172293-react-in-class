@@ -11,9 +11,15 @@ const __dirname = dirname(__filename);
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  optimizeDeps: {
+    include: ["lucide-react"],
+  },
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"), //Cuando veas @, interprétalo como /src
     },
+  },
+  server: {
+    host: true,
   },
 });

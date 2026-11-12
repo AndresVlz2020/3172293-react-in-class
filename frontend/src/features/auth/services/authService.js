@@ -6,9 +6,6 @@ import { API_URL } from "@/features/config";
 const AUTH_API_URL = `${API_URL}/auth`;
 
 export async function login(userData) {
-    // Verificamos en consola qué datos están llegando desde el componente/formulario
-    console.log("Datos enviados al servicio de Login:", userData);
-
     const response = await fetch(`${AUTH_API_URL}/login`, {
         method: "POST",
 
@@ -27,7 +24,9 @@ export async function login(userData) {
     const data = await response.json();
 
     if (!response.ok) {
-        throw new Error(data.error || "Error al iniciar sesión");
+        const error = new Error(data.error || "Error al iniciar sesión");
+        error.status = response.status;
+        throw error;
     }
 
     return data;

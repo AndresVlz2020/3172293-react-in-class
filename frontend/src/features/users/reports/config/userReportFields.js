@@ -25,8 +25,8 @@ export const userReportFields = [
     default: false
   },
   {
-    key: "address",
-    label: "Dirección",
+    key: "isActive",
+    label: "Estado",
     default: false
   }
 ];

@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { DataTable, Button } from "@/shared";
-import { userColumns } from "../table/UserColumns";
+import { getUserColumns } from "../table/UserColumns";
 import { getUsers } from "../services/userServices";
 import { Link } from "react-router-dom";
 import ReportConfigModal from "../reports/components/ReportConfigModal";
 
-export default function UserListPage(){
+export default function UserListPage() {
     const [isReportOpen, setIsReportOpen] = useState(false);
     const [users, setUsers] = useState([]);
     const [error, setError] = useState("");
@@ -15,6 +15,19 @@ export default function UserListPage(){
             .then(setUsers)
             .catch((requestError) => setError(requestError.message));
     }, []);
+
+    const handleStatusUpdated = useCallback((userId, newStatus) => {
+        setUsers((prevUsers) =>
+            prevUsers.map((user) =>
+                user.id === userId ? { ...user, isActive: Boolean(newStatus) } : user,
+            ),
+        );
+    }, []);
+
+    const columns = useMemo(
+        () => getUserColumns(handleStatusUpdated),
+        [handleStatusUpdated],
+    );
 
     return (
         <div className="p-6">
@@ -32,7 +45,7 @@ export default function UserListPage(){
             {error ? (
                 <p className="text-red-600">{error}</p>
             ) : (
-                <DataTable data={users} columns={userColumns} />
+                <DataTable data={users} columns={columns} />
             )}
             <ReportConfigModal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)} />
         </div>

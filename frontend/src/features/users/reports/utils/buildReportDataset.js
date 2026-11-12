@@ -28,6 +28,11 @@ export function buildReportDataset({
     selectedFields.map((field) => {
       const value = user[field.key]; // Acceso dinámico a la propiedad
 
+      // Normalización: los booleanos (ej: isActive) se muestran legibles
+      if (typeof value === "boolean") {
+        return value ? "Activo" : "Inactivo";
+      }
+
       // Normalización: evita undefined o null en el reporte
       return value ?? "";
     })

@@ -16,14 +16,13 @@ export const userService = {
     // idealmente ya validados a nivel estructural (DTO / Schema)
     async createUser(data) {
 
-    const hashedPassword = await bcrypt.hash(data.userPassword, 10);
+        const hashedPassword = await bcrypt.hash(data.userPassword, 10);
 
-    const userData = {
-        ...data,
-        userPassword: hashedPassword,
-    };
+        const userData = {
+            ...data,
+            userPassword: hashedPassword,
+        };
 
-    console.log("SERVICE DATA:", userData);
         // En este punto, en una arquitectura real, deberián, ocurrir:
         // - Validaciones de reglas de negocio
         // - Transformaciones de datos (ej: hash de password)
@@ -35,7 +34,37 @@ export const userService = {
         return await userRepository.create(userData);
     },
 
-    async getAllUsers() {
-        return await userRepository.findAll();
+    async getAllUsers(options = {}) {
+        return await userRepository.findAll(options);
+    },
+
+    async getUserById(userId) {
+        return await userRepository.findById(userId);
+    },
+
+    async updateUser(userId, data) {
+        const userData = { ...data };
+
+        // Solo se hashea la contraseña si viene en la petición y no está vacía
+        // (en edición, una contraseña vacía significa "no cambiarla")
+        if (userData.userPassword) {
+            userData.userPassword = await bcrypt.hash(userData.userPassword, 10);
+        } else {
+            delete userData.userPassword;
+        }
+
+        return await userRepository.update(userId, userData);
+    },
+
+    async updateStatus(userId, isActive) {
+        return await userRepository.updateStatus(userId, isActive);
+    },
+
+    async getPermissionsByUserId(userId) {
+        return await userRepository.getPermissionsByUserId(userId);
+    },
+
+    async updatePermissions(userId, permissionIds) {
+        return await userRepository.updatePermissions(userId, permissionIds);
     },
 };

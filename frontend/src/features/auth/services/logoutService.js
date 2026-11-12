@@ -2,5 +2,6 @@
 // Cerrar sesión eliminando JWT
 
 export function logout() {
-    sessionStorage.removeItem("token");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
 }

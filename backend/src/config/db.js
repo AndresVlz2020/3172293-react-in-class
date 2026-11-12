@@ -1,63 +1,44 @@
-// Importamos el paquete 'pg' usando el sistema de módulos ES.// Importamos el paqueteSQL para Node.js
-
+// Importamos el paquete 'pg' usando el sistema de módulos ES.
 import pkg from 'pg';
-
-// Extraemos la clase Pool desde el paquete
-// Pool gestiona un conjunto de conexiones reutilizables a la BD.
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const { Pool } = pkg;
 
-// Importamos dotenv para poder leer variables de entorno desde un archivo .env
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-import dotenv from 'dotenv';
-
-// Cargamos las variables definidas en el archivo .env  
-
+// Cargamos las variables definidas en el archivo .env desde la raíz del backend
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 dotenv.config();
 
-// Creanos y exportamos una instancia únoca del pool de PostgreSQL
-// Esta instancia se reutilizará en toda la aplicación
+const requiredDatabaseEnv = ["DB_USER", "DB_PASSWORD", "DB_NAME"];
+const missingDatabaseEnv = requiredDatabaseEnv.filter(
+    (key) => !process.env[key],
+);
 
+if (missingDatabaseEnv.length > 0) {
+    throw new Error(
+        `Faltan variables de conexión a PostgreSQL: ${missingDatabaseEnv.join(", ")}`,
+    );
+}
+
+// Creamos y exportamos una instancia única del pool de PostgreSQL
 export const pool = new Pool({
-
-    // Host donde se encuentra PostgreSQL (ej: localhost o IP del servidor)
-
-    host: process.env.DB_HOST,
-
-    // Puerto donde se encuentra PostgreSQL
-
-    port: process.env.DB_PORT,
-
-    // Usuario con permisos sobre la base de datos
-
+    host: process.env.DB_HOST || 'localhost',
+    port: Number(process.env.DB_PORT) || 5432,
     user: process.env.DB_USER,
-
-    // Contrasena del usuario
-
     password: process.env.DB_PASSWORD,
-
-    // Nombre de la base de datos a la que nos conectamos
-
     database: process.env.DB_NAME,
-
-    // Número de conexiones activas en el pool
-
     max: 10,
-
-    // Tiempo máximo (en ms) que una conexión puede estar inactiva antes de ser cerrada automáticamente 
     idleTimeoutMillis: 30000,
+});
 
-    });
+pool.on("connect", () => {
+    console.log('Conectado a PostgreSQL');
+});
 
-    // Evento que se dispara cada vez que el pool establece una conexión útil para logs y verificación en desarrollo
-
-    pool.on("connect", () => {
-        console.log('Conectado a PostgreSQL');
-    });
-
-    // Evento que se dispara cada vez que ocurre un error en el pool, Importante para monitoreo y diagnnóstico de fallos
-
-    pool.on("error", (err)  => {
-        console.error('Error en la conexión a PostgreSQL', err);
-    });
-    
+pool.on("error", (err) => {
+    console.error('Error en la conexión a PostgreSQL', err);
+});

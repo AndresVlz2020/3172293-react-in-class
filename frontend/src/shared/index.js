@@ -6,6 +6,7 @@ export { fileSchema } from "./schemas/fileSchema";
 
 export { default as AuthLayout } from "./layouts/AuthLayout";
 export { default as DashboardLayout } from "./layouts/DashboardLayout";
+export { default as ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 
 // Componentes
@@ -32,3 +33,11 @@ export {
 // Layout components
 export { default as Navbar } from "./layouts/Navbar";
 export { default as SearchField } from "./components/SearchField";
+
+// Servicios de alertas (SweetAlert2)
+export {
+  showSuccessAlert,
+  showErrorAlert,
+  showWarningAlert,
+  showConfirmAlert,
+} from "./services/alertService";
